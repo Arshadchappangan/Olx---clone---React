@@ -3,18 +3,27 @@ import React, { useState } from 'react'
 import Input from '../Input/Input';
 import { userAuth } from '../Context/Auth';
 import { addDoc, collection } from 'firebase/firestore';
-import { fireStore } from '../Firebase/Firebase';
+import { fetchFromFirestore, fireStore } from '../Firebase/Firebase';
 
-const Sell = ({toggleSellModal,status}) => {
+import fileUpload from '../../assets/fileUpload.svg';
+import loading from '../../assets/loading.gif';
+import close from '../../assets/close.svg'
+
+const Sell = ({toggleSellModal,status,setItems}) => {
 
     const [title,setTitle] = useState('');
     const [category,setCategory] = useState('');
     const [price,setPrice] = useState('');
     const [description,setDescription] = useState('');
+    const [image,setImage] = useState(null);
 
     const [submitting,setSubmitting] = useState(false)
 
     let auth = userAuth(); // context consuming
+
+    const handleImageUpload = (e) => {
+        if(e.target.files) setImage(e.target.files[0]);
+    }
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,6 +34,28 @@ const Sell = ({toggleSellModal,status}) => {
         }
 
         setSubmitting(true);
+
+        const readImageAsDataUrl = (file) => {
+            return new Promise ((resolve,reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const imageUrl = reader.result
+                    localStorage.setItem(`image_${File.name}`,imageUrl);
+                    resolve(imageUrl);
+                }
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            })
+        }
+
+        let imageUrl = '';
+        if(image) {
+            try {
+                imageUrl = await readImageAsDataUrl(image);
+            } catch (error) {
+                
+            }
+        }
 
         const trimmedTitle = title.trim();
         const trimmedCategory = category.trim();
@@ -43,10 +74,15 @@ const Sell = ({toggleSellModal,status}) => {
                 category,
                 price,
                 description,
+                imageUrl,
                 userId : auth.user.uid,
                 userName : auth.user.displayName || 'Untitled User',
                 createdAt : new Date().toDateString()
             })
+
+            const datas = await fetchFromFirestore();
+            setItems(datas);
+
             toggleSellModal();
         } catch (error) {
             console.log(error);
@@ -66,6 +102,12 @@ const Sell = ({toggleSellModal,status}) => {
       }} onClick={toggleSellModal} show={status} className='bg-black' position={'center'} size='md' popup={true}>
 
         <ModalBody className='bg-white h-96 p-0 rounded-md' onClick={(e) => e.stopPropagation()}>
+
+            <img src={close} onClick={() => {
+                toggleSellModal();
+                setImage(null)
+                }} className='w-6 absolute z-10 top-6 right-8 cursor-pointer' alt="" />
+
             <div className='p-6 pl-8 pr-8 pb-8'>
                 <p className='font-bold text-lg mb-3'>Sell Item</p>
 
@@ -74,11 +116,43 @@ const Sell = ({toggleSellModal,status}) => {
                     <Input setInput={setCategory} placeholder='Category'/>
                     <Input setInput={setPrice} placeholder='Price'/>
                     <Input setInput={setDescription} placeholder='Description'/>
+
+                    <div className='pt-2 w-full relative'>
+
+                        {
+                        image ?
+                        <div className='relative h-40 sm:h-60 w-full flex justify-center border-2 border-black border-solid rounded-md overflow-hidden'>
+                            <img className='object-contain' src={URL.createObjectURL(image)} alt="" />
+                        </div>
+                        :
+                        <div className='relative h-40 sm:h-60 w-full border-2 border-black border-solid rounded-md'>
+                            <input type="file"
+                                    onChange={handleImageUpload}
+                                    className='absolute inset-10 h-full w-full opacity-0 cursor-pointer z-30' 
+                                    required />
+                                <div className='absolute top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] flex flex-col items-center'>
+                                    <img className='w-12' src={fileUpload} alt="" />
+                                    <p  className="text-center text-sm pt-2">Click to upload images</p>
+                                    <p  className="text-center text-sm pt-2">SVG, PNG, JPG</p>
+                                </div>
+                        </div>
+                    }
+
+                    </div>
+
+
                     {
                         submitting ?
-                        <div>Processing...</div>
+                        <div className='w-full flex h-14 justify-center pt-4 pb-2'>
+                            <img src={loading} className='w-32 object-cover' alt="" />
+                        </div>
                         :
-                        <button>Sell Item</button>
+                        <div className='w-full p-2'>
+                            <button 
+                            className='w-full p-3 rounded-lg text-white'
+                            style={{backgroundColor:'#002f34'}}
+                            >Sell Item</button>
+                        </div>
                     }
                 </form>
             </div>

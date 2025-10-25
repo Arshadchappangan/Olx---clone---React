@@ -1,7 +1,10 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import NavBar from '../Navbar/NavBar';
 import Login from '../Modal/Login';
 import Sell from '../Modal/Sell';
+import Card from '../Card/Card';
+import { ItemContext } from '../Context/Item';
+import { fetchFromFirestore } from '../Firebase/Firebase';
 
 
 
@@ -12,11 +15,18 @@ const Home = () => {
   let toggleLoginModal = () => setOpenLogin(!openLogin);
   let toggleSellModal = () => setOpenSell(!openSell);
 
+  let itemsCtx = ItemContext();
+
+  useEffect(() => {
+    console.log('updated items',itemsCtx.items);
+  },[itemsCtx.items])
+
   return (
     <div>
       <NavBar toggleLoginModal={toggleLoginModal} toggleSellModal={toggleSellModal} />
       <Login toggleLoginModal={toggleLoginModal} status={openLogin} />
-      <Sell toggleSellModal={toggleSellModal} status={openSell} />
+      <Sell setItems={(itemsCtx).setItems} toggleSellModal={toggleSellModal} status={openSell} />
+      <Card items={itemsCtx.items || []}/>
     </div>
   )
 }
