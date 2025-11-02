@@ -1,13 +1,19 @@
+import { Route, Routes } from 'react-router-dom'
 import './App.css'
-import Login from './Components/Modal/Login'
-import NavBar from './Components/Navbar/NavBar'
 import Home from './Components/Pages/Home'
+import Details from './Components/Details/Details'
+import MyAds from './Components/Pages/MyAds'
+
 
 function App() {
 
   return (
     <>
-      <Home />
+      <Routes>
+        <Route path='/' element={<Home />} />
+        <Route path='/details' element={<Details />} />
+        <Route path='/myAds' element={<MyAds />} />
+      </Routes>
     </>
   )
 }

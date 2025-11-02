@@ -1,5 +1,5 @@
 import { Modal, ModalBody } from 'flowbite-react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import Input from '../Input/Input';
 import { userAuth } from '../Context/Auth';
 import { addDoc, collection } from 'firebase/firestore';
@@ -15,6 +15,7 @@ const Sell = ({toggleSellModal,status,setItems}) => {
     const [category,setCategory] = useState('');
     const [price,setPrice] = useState('');
     const [description,setDescription] = useState('');
+    const [location,setLocation] = useState('')
     const [image,setImage] = useState(null);
 
     const [submitting,setSubmitting] = useState(false)
@@ -61,8 +62,9 @@ const Sell = ({toggleSellModal,status,setItems}) => {
         const trimmedCategory = category.trim();
         const trimmedPrice = price.trim();
         const trimmedDescription = description.trim();
+        const trimmedLocation = location.trim();
 
-        if(!trimmedTitle || !trimmedCategory || !trimmedPrice || !trimmedDescription) {
+        if(!trimmedTitle || !trimmedCategory || !trimmedPrice || !trimmedDescription || !trimmedLocation) {
             alert('All fields are required');
             setSubmitting(false);
             return;
@@ -74,7 +76,9 @@ const Sell = ({toggleSellModal,status,setItems}) => {
                 category,
                 price,
                 description,
+                location,
                 imageUrl,
+                isActive : true,
                 userId : auth.user.uid,
                 userName : auth.user.displayName || 'Untitled User',
                 createdAt : new Date().toDateString()
@@ -116,6 +120,7 @@ const Sell = ({toggleSellModal,status,setItems}) => {
                     <Input setInput={setCategory} placeholder='Category'/>
                     <Input setInput={setPrice} placeholder='Price'/>
                     <Input setInput={setDescription} placeholder='Description'/>
+                    <Input setInput={setLocation} placeholder='Location'/>
 
                     <div className='pt-2 w-full relative'>
 

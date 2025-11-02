@@ -31,7 +31,7 @@ const Login = ({toggleLoginModal,status}) => {
             base : 'relative w-full p-4 md:h-auto',
             inner : 'relative flex max-h-[90dvh] flex-col rounded-lg bg-white shadow dark:bg-gray-700'
           }
-        }} onClick={toggleLoginModal} show={status} className='bg-black rounded-none' position={'center'} size='md' popup={true}>
+        }} onClick={toggleLoginModal} show={status} className='bg-gray-400 rounded-none' position={'center'} size='md' popup={true}>
           <div onClick={(e) => e.stopPropagation()} className='p-6 pl-2 pr-2 bg-white'>
             <img onClick={toggleLoginModal} src={close} className='w-6 absolute z-10 top-4 right-4 cursor-pointer' alt="" />
             <Carousel slide={false} theme={{
@@ -86,8 +86,6 @@ const Login = ({toggleLoginModal,status}) => {
               </div>
             </div>
           </ModalBody>
-          
-
         </Modal>
     </div>
   )
